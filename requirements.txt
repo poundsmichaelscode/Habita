@@ -1,0 +1,77 @@
+
+---
+
+## 📦 `requirements.txt`
+
+```txt
+# Core
+Django>=4.2,<5.0
+djangorestframework>=3.14,<4.0
+
+# Environment & Config
+python-dotenv>=1.0.0
+django-environ>=0.11.2
+
+# Database
+psycopg2-binary>=2.9.9
+
+# CORS
+django-cors-headers>=4.3.1
+
+# Authentication (optional for MVP but future-ready)
+djangorestframework-simplejwt>=5.3.1
+
+# Media & Image Handling
+Pillow>=10.1.0
+
+# API Utilities
+django-filter>=23.5
+
+# Production Server
+gunicorn>=21.2.0
+
+# Development & Debugging
+django-debug-toolbar>=4.2.0
+
+# Testing
+pytest>=7.4.4
+pytest-django>=4.7.0
+```
+
+---
+
+## 🧠 Why These Packages?
+
+* **Django / DRF** → Core backend & API
+* **python-dotenv / django-environ** → Environment variables in Docker
+* **psycopg2-binary** → PostgreSQL support (recommended for listings apps)
+* **cors-headers** → Frontend ↔ Backend communication
+* **SimpleJWT** → Authentication-ready
+* **Pillow** → Property images
+* **django-filter** → Search & filtering for listings
+* **gunicorn** → Production-ready WSGI server
+* **pytest** → Clean, modern testing setup
+
+---
+
+## 🐳 Docker Tip
+
+In your **Dockerfile**, install dependencies like this:
+
+```dockerfile
+RUN pip install --no-cache-dir -r requirements.txt
+```
+
+---
+
+## 📌 Optional Add-ons (Later)
+
+
+
+
+redis
+django-redis
+celery
+```
+
+
