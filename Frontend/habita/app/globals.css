@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+
+@theme {
+  --color-habita: #1e40af;
+  --color-habita-dark: #fbbf24;
+}
