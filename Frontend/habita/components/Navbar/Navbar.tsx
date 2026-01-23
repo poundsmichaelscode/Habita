@@ -1,5 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
+import SearchFilters from "@/components/Navbar/SearchFliters"
+import Usernav from "./Usernav";
+import AddPropertybutton from "./AddPropertybutton";
+
+
 
 const Navbar = () => {
   return (
@@ -15,8 +20,15 @@ const Navbar = () => {
               priority
             />
           </Link>
-          <div className="flex space-x-6"></div>
+          <div className="flex space-x-6">
 
+            <SearchFilters/> 
+          </div>
+<div className="flex iytems-center space-x-6">
+  <AddPropertybutton/> 
+
+  <Usernav/>
+</div>
 
 
         </div>
