@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import SearchFilters from "@/components/Navbar/SearchFliters"
+import SearchFilters from "@/app/components/Navbar/SearchFliters"
 import Usernav from "./Usernav";
 import AddPropertybutton from "./AddPropertybutton";
 

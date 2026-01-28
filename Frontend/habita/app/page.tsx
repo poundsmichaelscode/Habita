@@ -1,6 +1,6 @@
 
-import Cartegories from "@/components/Cartegories";
-import Propertylist from "@/components/Properties/Propertylist";
+import Cartegories from "@/app/components/Cartegories";
+import Propertylist from "@/app/components/Properties/Propertylist";
 
 export default function Home() {
   return (
