@@ -1,80 +1,75 @@
 import { getAccessToken } from "../lib/actions";
 
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:8000";
+
+const buildUrl = (url: string): string => `${API_HOST}${url}`;
+
+const parseResponse = async (response: Response) => {
+    const contentType = response.headers.get("content-type");
+    let data: any = null;
+
+    if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+    } else {
+        data = await response.text();
+    }
+
+    if (!response.ok) {
+        console.error("API ERROR:", data);
+        return data;
+    }
+
+    return data;
+};
+
 const apiService = {
     get: async function (url: string): Promise<any> {
-        console.log('get', url);
-
         const token = await getAccessToken();
 
-        return new Promise((resolve, reject) => {
-            fetch(`${process.env.NEXT_PUBLIC_API_HOST}${url}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-                .then(response => response.json())
-                .then((json) => {
-                    console.log('Response:', json);
+        const response = await fetch(buildUrl(url), {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            cache: "no-store",
+        });
 
-                    resolve(json);
-                })
-                .catch((error => {
-                    reject(error);
-                }))
-        })
+        return await parseResponse(response);
     },
 
-    post: async function(url: string, data: any): Promise<any> {
-        console.log('post', url, data);
-
+    post: async function (url: string, data: any): Promise<any> {
         const token = await getAccessToken();
+        const isFormData = data instanceof FormData;
 
-        return new Promise((resolve, reject) => {
-            fetch(`${process.env.NEXT_PUBLIC_API_HOST}${url}`, {
-                method: 'POST',
-                body: data,
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-                .then(response => response.json())
-                .then((json) => {
-                    console.log('Response:', json);
+        const response = await fetch(buildUrl(url), {
+            method: "POST",
+            body: isFormData ? data : JSON.stringify(data),
+            headers: {
+                Accept: "application/json",
+                ...(isFormData ? {} : { "Content-Type": "application/json" }),
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+        });
 
-                    resolve(json);
-                })
-                .catch((error => {
-                    reject(error);
-                }))
-        })
+        return await parseResponse(response);
     },
 
-    postWithoutToken: async function(url: string, data: any): Promise<any> {
-        console.log('post', url, data);
+    postWithoutToken: async function (url: string, data: any): Promise<any> {
+        const isFormData = data instanceof FormData;
 
-        return new Promise((resolve, reject) => {
-            fetch(`${process.env.NEXT_PUBLIC_API_HOST}${url}`, {
-                method: 'POST',
-                body: data,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then((json) => {
-                    console.log('Response:', json);
+        const response = await fetch(buildUrl(url), {
+            method: "POST",
+            body: isFormData ? data : JSON.stringify(data),
+            headers: {
+                Accept: "application/json",
+                ...(isFormData ? {} : { "Content-Type": "application/json" }),
+            },
+        });
 
-                    resolve(json);
-                })
-                .catch((error => {
-                    reject(error);
-                }))
-        })
-    }
-}
+        return await parseResponse(response);
+    },
+};
 
 export default apiService;

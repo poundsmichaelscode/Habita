@@ -82,7 +82,7 @@ const Categories = () => {
                 onClick={() => _setCategory('tiny_homes')} 
                 className={`pb-4 flex flex-col items-center space-y-2 border-b-2 ${category == 'tiny_homes' ? 'border-black' : 'border-white'} opacity-60 hover:border-gray-200 hover:opacity-100`}>
                 <Image
-                    src="/Frontend/public/icons8-home-128.png"
+                    src="/icons8-home-128.png"
                     alt="Category - Beach"
                     width={20}
                     height={20}

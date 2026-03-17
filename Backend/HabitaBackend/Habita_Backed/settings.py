@@ -40,7 +40,7 @@ AUTH_USER_MODEL = 'useraccounts.User'
 
 SITE_ID =1
 
-WEBSITE_URL ='http://localhost:8000'
+WEBSITE_URL = 'http://localhost:8000'
 
 SIMPLE_JWT ={"ACCESS_TOKEN_LIFETIME":timedelta(minutes=60),
              "REFRESH_TOKEN_LIFETIME":timedelta(days=7),
@@ -198,5 +198,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-MEDIA_URL = 'media/'
-MEDIA_ROOT =BASE_DIR / 'media'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

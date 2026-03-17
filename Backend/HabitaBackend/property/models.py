@@ -20,18 +20,20 @@ class Property(models.Model):
     address = models.CharField(max_length=255, blank=True, null=True)
     category = models.CharField(max_length=255)
     favorited = models.ManyToManyField(User, related_name='favorites', blank=True)
-    image = models.ImageField(upload_to='uploads/properties')
+    image = models.ImageField(upload_to='uploads/properties/')
     landlord = models.ForeignKey(User, related_name='properties', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
     def image_url(self):
-        return f'{settings.WEBSITE_URL}{self.image.url}'
+        if self.image:
+            return f"{settings.WEBSITE_URL}{self.image.url}"
+        return None
 
 
 class Reservation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     property = models.ForeignKey(Property, related_name='reservations', on_delete=models.CASCADE)
-
     start_date = models.DateField()
     end_date = models.DateField()
     number_of_nights = models.IntegerField()
@@ -39,4 +41,3 @@ class Reservation(models.Model):
     total_price = models.FloatField()
     created_by = models.ForeignKey(User, related_name='reservations', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-  

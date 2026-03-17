@@ -2,11 +2,19 @@
 
 import { cookies } from 'next/headers';
 
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8000';
+
+type RefreshResponse = {
+    access?: string;
+    refresh?: string;
+    [key: string]: any;
+};
+
 /* ================================
    REFRESH TOKEN
 ================================ */
 
-export async function handleRefresh() {
+export async function handleRefresh(): Promise<string | null> {
     console.log('handleRefresh');
 
     const cookieStore = await cookies();
@@ -18,24 +26,26 @@ export async function handleRefresh() {
     }
 
     try {
-        const response = await fetch('http://localhost:8000/api/auth/token/refresh/', {
+        const response = await fetch(`${API_HOST}/api/auth/token/refresh/`, {
             method: 'POST',
             headers: {
-                'Accept': 'application/json',
+                Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 refresh: refreshToken,
             }),
+            cache: 'no-store',
         });
 
-        const json = await response.json();
+        const json: RefreshResponse = await response.json();
         console.log('Response - Refresh:', json);
 
-        if (json.access) {
+        if (response.ok && json.access) {
             cookieStore.set('session_access_token', json.access, {
                 httpOnly: true,
-                secure: false, // change to true in production
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
                 maxAge: 60 * 60,
                 path: '/',
             });
@@ -45,9 +55,8 @@ export async function handleRefresh() {
 
         await resetAuthCookies();
         return null;
-
     } catch (error) {
-        console.log('Refresh error:', error);
+        console.error('Refresh error:', error);
         await resetAuthCookies();
         return null;
     }
@@ -61,26 +70,29 @@ export async function handleLogin(
     userId: string,
     accessToken: string,
     refreshToken: string
-) {
+): Promise<void> {
     const cookieStore = await cookies();
 
-    cookieStore.set('session_userid', userId, {
+    cookieStore.set('session_userid', String(userId), {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7,
         path: '/',
     });
 
     cookieStore.set('session_access_token', accessToken, {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         maxAge: 60 * 60,
         path: '/',
     });
 
     cookieStore.set('session_refresh_token', refreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7,
         path: '/',
     });
@@ -90,35 +102,35 @@ export async function handleLogin(
    RESET COOKIES
 ================================ */
 
-export async function resetAuthCookies() {
+export async function resetAuthCookies(): Promise<void> {
     const cookieStore = await cookies();
 
-    cookieStore.set('session_userid', '', { path: '/' });
-    cookieStore.set('session_access_token', '', { path: '/' });
-    cookieStore.set('session_refresh_token', '', { path: '/' });
+    cookieStore.delete('session_userid');
+    cookieStore.delete('session_access_token');
+    cookieStore.delete('session_refresh_token');
 }
 
 /* ================================
    GETTERS
 ================================ */
 
-export async function getUserId() {
+export async function getUserId(): Promise<string | null> {
     const cookieStore = await cookies();
     return cookieStore.get('session_userid')?.value ?? null;
 }
 
-export async function getAccessToken() {
+export async function getAccessToken(): Promise<string | null> {
     const cookieStore = await cookies();
-    let accessToken = cookieStore.get('session_access_token')?.value;
+    let accessToken = cookieStore.get('session_access_token')?.value ?? null;
 
     if (!accessToken) {
         accessToken = await handleRefresh();
     }
 
-    return accessToken ?? null;
+    return accessToken;
 }
 
-export async function getRefreshToken() {
+export async function getRefreshToken(): Promise<string | null> {
     const cookieStore = await cookies();
     return cookieStore.get('session_refresh_token')?.value ?? null;
 }
