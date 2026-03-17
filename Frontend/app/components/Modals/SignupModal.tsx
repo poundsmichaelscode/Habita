@@ -35,9 +35,11 @@ const SignupModal = () => {
 
             console.log("SIGNUP RESPONSE:", response);
 
-            if (response?.access && response?.refresh && response?.user?.pk) {
+            const userId = response?.user?.pk || response?.user?.id;
+
+            if (response?.access && response?.refresh && userId) {
                 await handleLogin(
-                    String(response.user.pk),
+                    String(userId),
                     response.access,
                     response.refresh
                 );
@@ -107,7 +109,6 @@ const SignupModal = () => {
 
             <CustomButton
                 label={loading ? "Submitting..." : "Submit"}
-                onClick={() => {}}
                 type="submit"
                 disabled={loading}
             />

@@ -33,14 +33,16 @@ const LoginModal = () => {
 
             console.log("LOGIN RESPONSE:", response);
 
-            if (response?.access && response?.refresh && response?.user?.pk) {
+            const userId = response?.user?.pk || response?.user?.id;
+
+            if (response?.access && response?.refresh && userId) {
                 await handleLogin(
-                    String(response.user.pk),
+                    String(userId),
                     response.access,
                     response.refresh
                 );
 
-                loginModal.close();
+                loginModal.Close();
                 router.push("/");
                 router.refresh();
                 return;
@@ -96,7 +98,6 @@ const LoginModal = () => {
 
             <CustomButton
                 label={loading ? "Submitting..." : "Submit"}
-                onClick={() => {}}
                 type="submit"
                 disabled={loading}
             />
@@ -106,7 +107,7 @@ const LoginModal = () => {
     return (
         <Modal
             isOpen={loginModal.isOpen}
-            close={loginModal.close}
+            close={loginModal.Close}
             label="Log in"
             content={content}
         />

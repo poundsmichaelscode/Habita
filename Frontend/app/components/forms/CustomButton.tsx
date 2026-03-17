@@ -1,22 +1,30 @@
 interface CustomButtonProps {
     label: string;
     className?: string;
-    onClick: () => void;
+    onClick?: () => void;
+    type?: "button" | "submit" | "reset";
+    disabled?: boolean;
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
     label,
-    className,
-    onClick
+    className = "",
+    onClick,
+    type = "button",
+    disabled = false,
 }) => {
     return (
-        <div 
+        <button
+            type={type}
             onClick={onClick}
-            className={`w-full py-4 bg-habita hover:bg-blue text-black text-center rounded-xl transition cursor-pointer ${className}`}
+            disabled={disabled}
+            className={`w-full py-4 bg-habita hover:bg-blue text-black text-center rounded-xl transition 
+            ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} 
+            ${className}`}
         >
             {label}
-        </div>
-    )
-}
+        </button>
+    );
+};
 
 export default CustomButton;
