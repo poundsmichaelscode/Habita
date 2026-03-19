@@ -1,22 +1,28 @@
-import { getAccessToken } from "../lib/actions";
-
-const API_HOST = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:8000";
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST || "http://127.0.0.1:8000";
 
 const buildUrl = (url: string): string => `${API_HOST}${url}`;
 
 const parseResponse = async (response: Response) => {
-    const contentType = response.headers.get("content-type");
+    const contentType = response.headers.get("content-type") || "";
     let data: any = null;
 
-    if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-    } else {
-        data = await response.text();
+    try {
+        if (contentType.includes("application/json")) {
+            data = await response.json();
+        } else {
+            data = await response.text();
+        }
+    } catch {
+        data = null;
     }
 
     if (!response.ok) {
-        console.error("API ERROR:", data);
-        return data;
+        console.error("API ERROR:", {
+            status: response.status,
+            statusText: response.statusText,
+            data,
+        });
+        return data ?? {};
     }
 
     return data;
@@ -24,14 +30,10 @@ const parseResponse = async (response: Response) => {
 
 const apiService = {
     get: async function (url: string): Promise<any> {
-        const token = await getAccessToken();
-
         const response = await fetch(buildUrl(url), {
             method: "GET",
             headers: {
                 Accept: "application/json",
-                "Content-Type": "application/json",
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
             cache: "no-store",
         });
@@ -39,8 +41,7 @@ const apiService = {
         return await parseResponse(response);
     },
 
-    post: async function (url: string, data: any): Promise<any> {
-        const token = await getAccessToken();
+    post: async function (url: string, data: any, token?: string): Promise<any> {
         const isFormData = data instanceof FormData;
 
         const response = await fetch(buildUrl(url), {

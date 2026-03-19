@@ -35,13 +35,15 @@ const SignupModal = () => {
 
             console.log("SIGNUP RESPONSE:", response);
 
-            const userId = response?.user?.pk || response?.user?.id;
+            const accessToken = response?.access || response?.access_token;
+            const refreshToken = response?.refresh || response?.refresh_token;
+            const userId = response?.user?.pk || response?.user?.id || null;
 
-            if (response?.access && response?.refresh && userId) {
+            if (accessToken && refreshToken) {
                 await handleLogin(
-                    String(userId),
-                    response.access,
-                    response.refresh
+                    userId ? String(userId) : "",
+                    accessToken,
+                    refreshToken
                 );
 
                 signupModal.close();
@@ -52,13 +54,15 @@ const SignupModal = () => {
 
             const tmpErrors: string[] = [];
 
-            Object.values(response || {}).forEach((error: any) => {
-                if (Array.isArray(error)) {
-                    tmpErrors.push(...error.map(String));
-                } else if (typeof error === "string") {
-                    tmpErrors.push(error);
-                }
-            });
+            if (response && typeof response === "object") {
+                Object.values(response).forEach((error: any) => {
+                    if (Array.isArray(error)) {
+                        tmpErrors.push(...error.map(String));
+                    } else if (typeof error === "string") {
+                        tmpErrors.push(error);
+                    }
+                });
+            }
 
             setErrors(tmpErrors.length ? tmpErrors : ["Signup failed"]);
         } catch (error: any) {
@@ -85,7 +89,7 @@ const SignupModal = () => {
                 onChange={(e) => setPassword1(e.target.value)}
                 placeholder="Your password"
                 type="password"
-                className="w-full h-[54px] px-4 border border-gray-300 rounded-xl"
+                className="w-full h-[54px] px-4 border border-gray-400 rounded-xl"
                 required
             />
 
@@ -101,7 +105,7 @@ const SignupModal = () => {
             {errors.map((error, index) => (
                 <div
                     key={`error_${index}`}
-                    className="p-5 bg-airbnb text-white rounded-xl opacity-80"
+                    className="p-5 bg-blue text-gray-900 rounded-xl opacity-80"
                 >
                     {error}
                 </div>
