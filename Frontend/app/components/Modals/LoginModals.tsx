@@ -38,11 +38,7 @@ const LoginModal = () => {
             const userId = response?.user?.pk || response?.user?.id || null;
 
             if (accessToken && refreshToken) {
-                await handleLogin(
-                    userId ? String(userId) : "",
-                    accessToken,
-                    refreshToken
-                );
+                await handleLogin(userId, accessToken, refreshToken);
 
                 loginModal.Close();
                 router.push("/");
@@ -78,7 +74,7 @@ const LoginModal = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your e-mail address"
                 type="email"
-                className="w-full h-[54px] px-4 border border-gray-500 rounded-xl"
+                className="w-full h-[54px] px-4 border border-gray-300 rounded-xl"
                 required
             />
 
@@ -87,18 +83,20 @@ const LoginModal = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Your password"
                 type="password"
-                className="w-full h-[54px] px-4 border border-gray-300 rounded-xl"
+                className="w-full h-[54px] px-4 border border-gray-400 rounded-xl"
                 required
             />
 
-            {errors.map((error, index) => (
-                <div
-                    key={`error_${index}`}
-                    className="p-5 bg-blue text-gray-400 rounded-xl opacity-80"
-                >
-                    {error}
-                </div>
-            ))}
+            {errors.map((error, index) => {
+                return (
+                    <div
+                        key={`error_${index}`}
+                        className="p-5 bg-airbnb text-black rounded-xl opacity-80"
+                    >
+                        {error}
+                    </div>
+                );
+            })}
 
             <CustomButton
                 label={loading ? "Submitting..." : "Submit"}

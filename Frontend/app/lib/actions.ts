@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 
-const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8000';
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://127.0.0.1:8000';
 
 type RefreshResponse = {
     access?: string;
@@ -10,13 +10,7 @@ type RefreshResponse = {
     [key: string]: any;
 };
 
-/* ================================
-   REFRESH TOKEN
-================================ */
-
 export async function handleRefresh(): Promise<string | null> {
-    console.log('handleRefresh');
-
     const cookieStore = await cookies();
     const refreshToken = cookieStore.get('session_refresh_token')?.value;
 
@@ -32,14 +26,11 @@ export async function handleRefresh(): Promise<string | null> {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                refresh: refreshToken,
-            }),
+            body: JSON.stringify({ refresh: refreshToken }),
             cache: 'no-store',
         });
 
         const json: RefreshResponse = await response.json();
-        console.log('Response - Refresh:', json);
 
         if (response.ok && json.access) {
             cookieStore.set('session_access_token', json.access, {
@@ -55,31 +46,30 @@ export async function handleRefresh(): Promise<string | null> {
 
         await resetAuthCookies();
         return null;
-    } catch (error) {
-        console.error('Refresh error:', error);
+    } catch {
         await resetAuthCookies();
         return null;
     }
 }
 
-/* ================================
-   LOGIN
-================================ */
-
 export async function handleLogin(
-    userId: string,
+    userId: string | null,
     accessToken: string,
     refreshToken: string
 ): Promise<void> {
     const cookieStore = await cookies();
 
-    cookieStore.set('session_userid', String(userId), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7,
-        path: '/',
-    });
+    if (userId) {
+        cookieStore.set('session_userid', userId, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 60 * 60 * 24 * 7,
+            path: '/',
+        });
+    } else {
+        cookieStore.delete('session_userid');
+    }
 
     cookieStore.set('session_access_token', accessToken, {
         httpOnly: true,
@@ -98,21 +88,12 @@ export async function handleLogin(
     });
 }
 
-/* ================================
-   RESET COOKIES
-================================ */
-
 export async function resetAuthCookies(): Promise<void> {
     const cookieStore = await cookies();
-
     cookieStore.delete('session_userid');
     cookieStore.delete('session_access_token');
     cookieStore.delete('session_refresh_token');
 }
-
-/* ================================
-   GETTERS
-================================ */
 
 export async function getUserId(): Promise<string | null> {
     const cookieStore = await cookies();

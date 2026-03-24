@@ -8,7 +8,7 @@ import { MessageType } from "@/app/Inbox/[id]/page";
 import { UserType } from "@/app/Inbox/page";
 
 interface ConversationDetailProps {
-    token: string;`````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````
+    token: string;
     userId: string;
     conversation: ConversationType;
     messages: MessageType[];

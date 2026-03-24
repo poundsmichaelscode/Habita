@@ -40,11 +40,7 @@ const SignupModal = () => {
             const userId = response?.user?.pk || response?.user?.id || null;
 
             if (accessToken && refreshToken) {
-                await handleLogin(
-                    userId ? String(userId) : "",
-                    accessToken,
-                    refreshToken
-                );
+                await handleLogin(userId, accessToken, refreshToken);
 
                 signupModal.close();
                 router.push("/");
